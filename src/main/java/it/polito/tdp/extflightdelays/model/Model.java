@@ -19,6 +19,7 @@ public class Model {
 	private ExtFlightDelaysDAO dao;
 	private Map<Integer, Airport> aMap;
 	private List<Airport> vertici;
+	private List<Airport> percorso;
 	
 	public Model() {
 		dao = new ExtFlightDelaysDAO();
@@ -49,5 +50,30 @@ public class Model {
 	
 	public List<Airport> getVertici(){
 		return vertici;
+	}
+	
+	public List<Airport> percorso(Airport partenza, Airport arrivo){
+		percorso = null;
+		
+		List<Airport> parziale = new ArrayList<>();
+		parziale.add(partenza);
+		
+		cerca(parziale, arrivo);
+		
+		return percorso;
+	}
+	
+	public void cerca(List<Airport> parziale, Airport arrivo) {
+		Airport ultimo = parziale.get(parziale.size()-1);
+		if(arrivo.equals(ultimo)) {
+			percorso = new ArrayList<>(parziale);
+		}
+		for(Airport a: Graphs.neighborListOf(grafo, ultimo)) {
+			if(!parziale.contains(a)) {
+				parziale.add(a);
+				cerca(parziale, arrivo);
+				parziale.remove(parziale.size()-1) ;
+			}
+		}
 	}
 }

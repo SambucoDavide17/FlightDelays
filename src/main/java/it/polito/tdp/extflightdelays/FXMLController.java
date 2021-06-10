@@ -1,6 +1,8 @@
 package it.polito.tdp.extflightdelays;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import it.polito.tdp.extflightdelays.model.Airport;
@@ -44,6 +46,8 @@ public class FXMLController {
     void doAnalizzaAeroporti(ActionEvent event) {
     	
     	txtResult.clear();
+    	cmbBoxAeroportoPartenza.getItems().clear();
+    	cmbBoxAeroportoDestinazione.getItems().clear();
     	int compagnie = 0;
     	try {
     		compagnie = Integer.parseInt(compagnieMinimo.getText());
@@ -57,10 +61,34 @@ public class FXMLController {
     	txtResult.appendText("# Vertici: " + model.vertexNumber() + "\n");
     	txtResult.appendText("# Archi: " + model.edgeNumber() + "\n");
 
+    	cmbBoxAeroportoPartenza.getItems().addAll(model.getVertici());
+    	cmbBoxAeroportoDestinazione.getItems().addAll(model.getVertici());
     }
 
     @FXML
     void doTestConnessione(ActionEvent event) {
+
+    	txtResult.clear();
+    	Airport partenza = cmbBoxAeroportoPartenza.getValue();
+    	if(partenza == null) {
+    		txtResult.appendText("Selezionare un aereoporto di partenza!\n");
+    		return;
+    	}
+    	Airport arrivo = cmbBoxAeroportoDestinazione.getValue();
+    	if(arrivo == null) {
+    		txtResult.appendText("Selezionare un aereoporto di arrivo!\n");
+    		return;
+    	}
+    	List<Airport> percorso = new ArrayList<>(model.percorso(partenza, arrivo));
+    	if(percorso == null) {
+    		txtResult.appendText("Non c'è un percorso tra glli aereoporti selezionati\n");
+    		return;
+    	}
+    	txtResult.appendText("Percorso tra gli aereoporti selezionati: \n");
+    	for(Airport a: percorso) {
+    		txtResult.appendText(a.toString() + "\n");
+    		
+    	}
 
     }
 
@@ -77,7 +105,5 @@ public class FXMLController {
     
     public void setModel(Model model) {
     	this.model = model;
-    	cmbBoxAeroportoPartenza.getItems().addAll(model.getVertici());
-    	cmbBoxAeroportoDestinazione.getItems().addAll(model.getVertici());
     }
 }
